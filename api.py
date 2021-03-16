@@ -1,6 +1,7 @@
 import flask
 from flask import request, jsonify
 from flask_cors import CORS
+from uuid import uuid4
 
 app = flask.Flask(__name__)
 CORS(app)
@@ -38,11 +39,12 @@ def getStocks():
 def postStock():
     # TODO: what if stock with ticker already exists? Merge? Keep separate?
     data = request.json
+    id = str(uuid4())
     ticker = data['ticker']
     avgPrice = float(data['avgPrice'])
     numberShares = int(data['numberShares'])
     stocks.append({
-        'id': 2,
+        'id': id,
          'ticker': ticker,
          'avgPrice': avgPrice,
          'numberShares': numberShares})
