@@ -13,7 +13,6 @@ from flask import make_response, jsonify
 
 app = flask.Flask(__name__)
 CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
 app.config["DEBUG"] = True
 
