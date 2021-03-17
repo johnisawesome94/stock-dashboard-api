@@ -4,6 +4,8 @@ from flask_cors import CORS
 from uuid import uuid4
 import os
 from flask_pymongo import pymongo
+from flask import make_response, jsonify
+
 
 
 MONGODB_URI = os.environ.get('MONGODB_URI', None)
@@ -13,7 +15,7 @@ app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-client = pymongo.MongoClient(CONNECTION_STRING)
+client = pymongo.MongoClient(MONGODB_URI)
 mongo = client.get_database('flask_mongodb_atlas')
 
 # stocks = [
@@ -47,16 +49,25 @@ def getStocks():
 
 @app.route('/stocks', methods=['POST'])
 def postStock():
-    # TODO: what if stock with ticker already exists? Merge? Keep separate?
-    data = request.json
-    id = str(uuid4())
-    ticker = data['ticker']
-    avgPrice = float(data['avgPrice'])
-    numberShares = int(data['numberShares'])
+    try:
+        # TODO: what if stock with ticker already exists? Merge? Keep separate?
+        data = request.json
+        id = str(uuid4())
+        ticker = data['ticker']
+        avgPrice = float(data['avgPrice'])
+        numberShares = int(data['numberShares'])
 
-    mongo.db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberOfShares, 'avgPrice': avgPrice })
+        mongo.db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberOfShares, 'avgPrice': avgPrice })
 
-    return generate_response('hi')
+        return generate_response('hi')
+    except Exception as e:
+            print(e)
+            responseObject = {
+                'status': 'fail',
+                'message': 'Try again',
+                'error': e
+            }
+            return make_response(jsonify(responseObject)), 500
 
 @app.route('/stocks/<string:stockId>', methods=['PUT'])
 def putStock(stockId):
