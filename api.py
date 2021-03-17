@@ -2,25 +2,34 @@ import flask
 from flask import request, jsonify
 from flask_cors import CORS
 from uuid import uuid4
+import os
+from flask_pymongo import pymongo
+
+
+MONGODB_URI = os.environ.get('MONGODB_URI', None)
+print(MONGODB_URI)
 
 app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-stocks = [
-    {"id": 0,
-     "ticker": 'AAPL',
-     "avgPrice": '30.28',
-     "numberShares": '33'},
-    {"id": 1,
-     "ticker": 'BOB',
-     "avgPrice": '0.23',
-     "numberShares": '3000'},
-    {"id": 2,
-      "ticker": 'HELLO',
-      "avgPrice": '1700.19',
-      "numberShares": '1'},
-]
+client = pymongo.MongoClient(CONNECTION_STRING)
+mongo = client.get_database('flask_mongodb_atlas')
+
+# stocks = [
+#     {"id": 0,
+#      "ticker": 'AAPL',
+#      "avgPrice": '30.28',
+#      "numberShares": '33'},
+#     {"id": 1,
+#      "ticker": 'BOB',
+#      "avgPrice": '0.23',
+#      "numberShares": '3000'},
+#     {"id": 2,
+#       "ticker": 'HELLO',
+#       "avgPrice": '1700.19',
+#       "numberShares": '1'},
+# ]
 
 ####################
 ## Util Functions ##
@@ -33,6 +42,7 @@ def generate_response(resp):
 ##################
 @app.route('/stocks', methods=['GET'])
 def getStocks():
+    stocks = mongo.db.stocks.find()
     return jsonify(stocks)
 
 @app.route('/stocks', methods=['POST'])
@@ -43,11 +53,9 @@ def postStock():
     ticker = data['ticker']
     avgPrice = float(data['avgPrice'])
     numberShares = int(data['numberShares'])
-    stocks.append({
-        'id': id,
-         'ticker': ticker,
-         'avgPrice': avgPrice,
-         'numberShares': numberShares})
+
+    mongo.db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberOfShares, 'avgPrice': avgPrice })
+
     return generate_response('hi')
 
 @app.route('/stocks/<string:stockId>', methods=['PUT'])
