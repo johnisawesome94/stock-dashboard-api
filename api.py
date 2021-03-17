@@ -15,8 +15,9 @@ app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-client = pymongo.MongoClient(MONGODB_URI)
-mongo = client.get_database('flask_mongodb_atlas')
+client = pymongo.MongoClient("mongodb+srv://jklundeen:clwa7YMEk7GIiVu7@cluster0.w7zd7.mongodb.net/bob?retryWrites=true&w=majority", connect=False)
+db = client.bob
+print(db.name)
 
 # stocks = [
 #     {"id": 0,
@@ -44,8 +45,11 @@ def generate_response(resp):
 ##################
 @app.route('/stocks', methods=['GET'])
 def getStocks():
-    stocks = mongo.db.stocks.find()
-    return jsonify(stocks)
+    stocks = db.stocks.find()
+    stockList = []
+    for stock in stocks:
+        stockList.append(stock)
+    return jsonify(stockList)
 
 @app.route('/stocks', methods=['POST'])
 def postStock():
@@ -57,16 +61,14 @@ def postStock():
         avgPrice = float(data['avgPrice'])
         numberShares = int(data['numberShares'])
 
-        mongo.db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberOfShares, 'avgPrice': avgPrice })
+        db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberShares, 'avgPrice': avgPrice })
 
         return generate_response('hi')
     except Exception as e:
             print(e)
             responseObject = {
                 'status': 'fail',
-                'message': 'Try again',
-                'error': e
-            }
+                'message': 'Try again'            }
             return make_response(jsonify(responseObject)), 500
 
 @app.route('/stocks/<string:stockId>', methods=['PUT'])
