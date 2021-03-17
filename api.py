@@ -13,6 +13,8 @@ from flask import make_response, jsonify
 
 app = flask.Flask(__name__)
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 app.config["DEBUG"] = True
 
 client = pymongo.MongoClient("mongodb+srv://jklundeen:clwa7YMEk7GIiVu7@cluster0.w7zd7.mongodb.net/bob?retryWrites=true&w=majority", connect=False)
