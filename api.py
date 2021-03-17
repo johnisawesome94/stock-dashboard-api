@@ -7,9 +7,9 @@ from flask_pymongo import pymongo
 from flask import make_response, jsonify
 
 
-
-MONGODB_URI = os.environ.get('MONGODB_URI', None)
-print(MONGODB_URI)
+#
+# MONGODB_URI = os.environ.get('MONGODB_URI', None)
+# print(MONGODB_URI)
 
 app = flask.Flask(__name__)
 CORS(app)
