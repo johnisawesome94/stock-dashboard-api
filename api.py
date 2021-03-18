@@ -20,21 +20,6 @@ app.config["DEBUG"] = True
 client = pymongo.MongoClient("mongodb+srv://bob:iHigFJkUoaUfiCtR@cluster0.w7zd7.mongodb.net/stock-dashboard-api?retryWrites=true&w=majority", connect=False)
 db = client.bob
 
-# stocks = [
-#     {"id": 0,
-#      "ticker": 'AAPL',
-#      "avgPrice": '30.28',
-#      "numberShares": '33'},
-#     {"id": 1,
-#      "ticker": 'BOB',
-#      "avgPrice": '0.23',
-#      "numberShares": '3000'},
-#     {"id": 2,
-#       "ticker": 'HELLO',
-#       "avgPrice": '1700.19',
-#       "numberShares": '1'},
-# ]
-
 ####################
 ## Util Functions ##
 ####################
@@ -97,18 +82,9 @@ def putStock(stockId):
 
 @app.route('/stocks/<string:stockId>', methods=['DELETE'])
 def deleteStock(stockId):
-    index = -1
-    for i in range(len(stocks)):
-        item = stocks[i]
-
-        if str(item['id']) == str(stockId):
-            index = i
-
-    if index > -1:
-        print(index)
-        stocks.pop(index)
-
-    return generate_response('hi')
+    mongo.db.members.delete_one({ "id": stockId })
+    resp = 'deleted member with id: ' + stockId
+    return generate_response(resp)
 
 if __name__ == '__main__':
     app.run(debug=True)
