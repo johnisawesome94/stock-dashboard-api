@@ -5,19 +5,20 @@ from uuid import uuid4
 import os
 from flask_pymongo import pymongo
 from flask import make_response, jsonify
+from bson.json_util import dumps
+from bson.json_util import loads
+
 
 
 
 MONGODB_URI = os.environ.get('MONGODB_URI', None)
-print(MONGODB_URI)
 
 app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-client = pymongo.MongoClient("mongodb+srv://jklundeen:clwa7YMEk7GIiVu7@cluster0.w7zd7.mongodb.net/bob?retryWrites=true&w=majority", connect=False)
+client = pymongo.MongoClient("mongodb+srv://bob:iHigFJkUoaUfiCtR@cluster0.w7zd7.mongodb.net/stock-dashboard-api?retryWrites=true&w=majority", connect=False)
 db = client.bob
-print(db.name)
 
 # stocks = [
 #     {"id": 0,
@@ -48,7 +49,9 @@ def getStocks():
     stocks = db.stocks.find()
     stockList = []
     for stock in stocks:
-        stockList.append(stock)
+        newStock = { 'id': stock['id'], 'ticker': stock['ticker'], 'numberShares': stock['numberShares'], 'avgPrice': stock['avgPrice'] }
+        stockList.append(newStock)
+
     return jsonify(stockList)
 
 @app.route('/stocks', methods=['POST'])
