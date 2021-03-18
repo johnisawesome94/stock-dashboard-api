@@ -65,18 +65,7 @@ def putStock(stockId):
     data = request.json
     avgPrice = float(data['avgPrice'])
     numberShares = int(data['numberShares'])
-
-    for i in range(len(stocks)):
-        item = stocks[i]
-
-        if str(item['id']) == str(stockId):
-            stock = {
-            'id': item['id'],
-             'ticker': item['ticker'],
-             'avgPrice': avgPrice,
-             'numberShares': numberShares
-            }
-            stocks[i] = stock
+    db.stocks.update({ "id": stockId }, { "$set": { 'avgPrice': avgPrice, 'numberShares': numberShares }})
 
     return generate_response('hi')
 
