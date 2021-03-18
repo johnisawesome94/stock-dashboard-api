@@ -7,6 +7,8 @@ from flask_pymongo import pymongo
 from flask import make_response, jsonify
 from bson.json_util import dumps
 from bson.json_util import loads
+from yahooquery import Ticker
+
 
 
 
@@ -34,7 +36,11 @@ def getStocks():
     stocks = db.stocks.find()
     stockList = []
     for stock in stocks:
-        newStock = { 'id': stock['id'], 'ticker': stock['ticker'], 'numberShares': stock['numberShares'], 'avgPrice': stock['avgPrice'] }
+        newStock = Ticker('ETH-USD').summary_detail
+        newStock['id'] = stock['id']
+        newStock['ticker'] = stock['ticker']
+        newStock['numberShares'] = stock['numberShares']
+        newStock['avgPrice'] = stock['avgPrice']
         stockList.append(newStock)
 
     return jsonify(stockList)
@@ -44,14 +50,19 @@ def postStock():
     try:
         # TODO: what if stock with ticker already exists? Merge? Keep separate?
         data = request.json
-        id = str(uuid4())
         ticker = data['ticker']
-        avgPrice = float(data['avgPrice'])
-        numberShares = int(data['numberShares'])
 
-        db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberShares, 'avgPrice': avgPrice })
+        if Ticker(ticker).summary_detail['ticker'].startsWith('Quote not found for ticker symbol:'):
+            responseObject = { 'status': 'fail', 'message': 'Could not find a stock with the ticker ' + ticker }
+            return make_response(jsonify(responseObject)), 500
+        else:
+            id = str(uuid4())
+            avgPrice = float(data['avgPrice'])
+            numberShares = int(data['numberShares'])
 
-        return generate_response('successfully added stock')
+            db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberShares, 'avgPrice': avgPrice })
+
+            return generate_response('successfully added stock')
     except Exception as e:
             print(e)
             responseObject = {
