@@ -6,10 +6,6 @@ import os
 from flask_pymongo import pymongo
 from yahooquery import Ticker
 
-
-
-
-
 MONGODB_URI = os.environ.get('MONGODB_URI', None)
 
 app = flask.Flask(__name__)
