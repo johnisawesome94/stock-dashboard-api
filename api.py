@@ -82,7 +82,7 @@ def putStock(stockId):
 
 @app.route('/stocks/<string:stockId>', methods=['DELETE'])
 def deleteStock(stockId):
-    mongo.db.members.delete_one({ "id": stockId })
+    db.stocks.delete_one({ "id": stockId })
     resp = 'deleted member with id: ' + stockId
     return generate_response(resp)
 
