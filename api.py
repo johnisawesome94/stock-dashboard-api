@@ -44,7 +44,7 @@ def postStock():
     data = request.json
     ticker = data['ticker']
 
-    if str(Ticker(ticker).summary_detail[ticker]).startswith('Quote not found for ticker symbol:'):
+    if isinstance(Ticker(ticker).summary_detail[ticker], str):
         responseObject = { 'status': 'fail', 'message': 'Could not find a stock with the ticker: ' + ticker }
         return make_response(jsonify(responseObject)), 500
     else:
