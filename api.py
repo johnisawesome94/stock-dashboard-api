@@ -1,12 +1,9 @@
 import flask
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask_cors import CORS
 from uuid import uuid4
 import os
 from flask_pymongo import pymongo
-from flask import make_response, jsonify
-from bson.json_util import dumps
-from bson.json_util import loads
 from yahooquery import Ticker
 
 
