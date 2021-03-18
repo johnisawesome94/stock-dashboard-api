@@ -51,7 +51,7 @@ def postStock():
 
         db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberShares, 'avgPrice': avgPrice })
 
-        return generate_response('hi')
+        return generate_response('successfully added stock')
     except Exception as e:
             print(e)
             responseObject = {
@@ -67,13 +67,14 @@ def putStock(stockId):
     numberShares = int(data['numberShares'])
     db.stocks.update({ "id": stockId }, { "$set": { 'avgPrice': avgPrice, 'numberShares': numberShares }})
 
-    return generate_response('hi')
+    return generate_response('updated stock with id: ' + stockId
+)
 
 @app.route('/stocks/<string:stockId>', methods=['DELETE'])
 def deleteStock(stockId):
     db.stocks.delete_one({ "id": stockId })
-    resp = 'deleted member with id: ' + stockId
-    return generate_response(resp)
+
+    return generate_response('deleted stock with id: ' + stockId)
 
 if __name__ == '__main__':
     app.run(debug=True)
