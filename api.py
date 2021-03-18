@@ -40,28 +40,21 @@ def getStocks():
 
 @app.route('/stocks', methods=['POST'])
 def postStock():
-    try:
-        # TODO: what if stock with ticker already exists? Merge? Keep separate?
-        data = request.json
-        ticker = data['ticker']
+    # TODO: what if stock with ticker already exists? Merge? Keep separate?
+    data = request.json
+    ticker = data['ticker']
 
-        if Ticker(ticker).summary_detail['ticker'].startsWith('Quote not found for ticker symbol:'):
-            responseObject = { 'status': 'fail', 'message': 'Could not find a stock with the ticker ' + ticker }
-            return make_response(jsonify(responseObject)), 500
-        else:
-            id = str(uuid4())
-            avgPrice = float(data['avgPrice'])
-            numberShares = int(data['numberShares'])
+    if Ticker(ticker).summary_detail[ticker].startswith('Quote not found for ticker symbol:'):
+        responseObject = { 'status': 'fail', 'message': 'Could not find a stock with the ticker: ' + ticker }
+        return make_response(jsonify(responseObject)), 500
+    else:
+        id = str(uuid4())
+        avgPrice = float(data['avgPrice'])
+        numberShares = int(data['numberShares'])
 
-            db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberShares, 'avgPrice': avgPrice })
+        db.stocks.insert_one({ 'id': id, 'ticker': ticker, 'numberShares': numberShares, 'avgPrice': avgPrice })
 
-            return generate_response('successfully added stock')
-    except Exception as e:
-            print(e)
-            responseObject = {
-                'status': 'fail',
-                'message': 'Try again'            }
-            return make_response(jsonify(responseObject)), 500
+        return generate_response('successfully added stock')
 
 @app.route('/stocks/<string:stockId>', methods=['PUT'])
 def putStock(stockId):
