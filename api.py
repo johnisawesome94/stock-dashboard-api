@@ -81,22 +81,28 @@ def deleteStock(stockId):
 @app.route('/dark-mode', methods=['GET'])
 def getDarkMode():
     darkMode = db.darkMode.find()
-    dark = darkMode['darkMode']
+    for dM in darkMode:
+        dark = dM['darkMode']
+        return jsonify({ 'darkMode': dark })
+    return jsonify('error happened')
 
-    return jsonify({ 'darkMode': dark })
+
 
 
 @app.route('/dark-mode', methods=['PUT'])
 def putDarkMode():
     data = request.json
     darkMode = data['darkMode']
+    gotIn = False
 
-    darkMode = db.darkMode.find()
-    if len(darkMode) > 0:
-        id = darkMode[0]['_id']
-        db.stocks.update({ "_id": id }, { "$set": { 'darkMode': darkMode }})
-    else:
-        db.stocks.insert_one({ 'darkMode': darkMode })
+    dM = db.darkMode.find()
+    for dark in dM:
+        gotIn = true
+        id = dM[0]['_id']
+        db.darkMode.update({ "_id": id }, { "$set": { 'darkMode': darkMode }})
+
+    if gotIn == False:
+        db.darkMode.insert_one({ 'darkMode': darkMode })
 
 
     return generate_response('successfully updated darkmode')
