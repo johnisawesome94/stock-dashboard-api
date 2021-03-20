@@ -26,7 +26,7 @@ def generate_response(resp):
 ##################
 @app.route('/stocks', methods=['GET'])
 def getStocks():
-    stocks = db.stocks.find({"ticker": {"$regex": "/^msft/"}})
+    stocks = db.stocks.find({"ticker": {"$regex": "^msft"}})
     stockList = []
     for stock in stocks:
         ticker = stock['ticker']
