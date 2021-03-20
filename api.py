@@ -26,7 +26,12 @@ def generate_response(resp):
 ##################
 @app.route('/stocks', methods=['GET'])
 def getStocks():
-    stocks = db.stocks.find({"ticker": {"$regex": "^msf"}})
+    search = request.args.get('search')
+
+    if search is None:
+        stocks = db.stocks.find()
+    else:
+        stocks = db.stocks.find({"ticker": {"$regex": "^" + search }})
     stockList = []
     for stock in stocks:
         ticker = stock['ticker']
