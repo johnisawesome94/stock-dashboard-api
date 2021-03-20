@@ -26,7 +26,7 @@ def generate_response(resp):
 ##################
 @app.route('/stocks', methods=['GET'])
 def getStocks():
-    stocks = db.stocks.find()
+    stocks = db.stocks.find({"$text": {"$search": 'msf'}})
     stockList = []
     for stock in stocks:
         ticker = stock['ticker']
@@ -75,40 +75,33 @@ def deleteStock(stockId):
     return generate_response('deleted stock with id: ' + stockId)
 
 
-##################
+#####################
 ## DARK-MODE API'S ##
-##################
+#####################
 @app.route('/dark-mode', methods=['GET'])
 def getDarkMode():
     darkMode = db.darkMode.find()
+    if darkMode is None:
+        return jsonify({ 'darkMode': True })
     for dM in darkMode:
         dark = dM['darkMode']
         return jsonify({ 'darkMode': dark })
     return jsonify('error happened')
 
-
-
-
 @app.route('/dark-mode', methods=['PUT'])
 def putDarkMode():
     data = request.json
-    darkMode = data['darkMode']
-    gotIn = False
+    newDarkMode = data['darkMode']
 
-    dM = db.darkMode.find()
-    for dark in dM:
-        gotIn = True
-        id = dark['_id']
-        db.darkMode.update({ "_id": id }, { "$set": { 'darkMode': darkMode }})
-
-    if gotIn == False:
-        db.darkMode.insert_one({ 'darkMode': darkMode })
-
+    darkMode = db.darkMode.find()
+    if darkMode is None:
+        db.darkMode.insert_one({ 'darkMode': newDarkMode })
+    else:
+        for dark in darkMode:
+            id = dark['_id']
+            db.darkMode.update({ "_id": id }, { "$set": { 'darkMode': newDarkMode }})
 
     return generate_response('successfully updated darkmode')
-
-
-
 
 
 if __name__ == '__main__':
