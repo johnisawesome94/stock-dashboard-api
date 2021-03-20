@@ -29,9 +29,10 @@ def getStocks():
     stocks = db.stocks.find()
     stockList = []
     for stock in stocks:
-        newStock = Ticker(stock['ticker']).summary_detail
+        ticker = stock['ticker']
+        newStock = Ticker(ticker).summary_detail[ticker]
         newStock['id'] = stock['id']
-        newStock['ticker'] = stock['ticker']
+        newStock['ticker'] = ticker
         newStock['numberShares'] = stock['numberShares']
         newStock['avgPrice'] = stock['avgPrice']
         stockList.append(newStock)
