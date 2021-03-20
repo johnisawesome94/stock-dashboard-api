@@ -31,7 +31,7 @@ def getStocks():
     if search is None:
         stocks = db.stocks.find()
     else:
-        stocks = db.stocks.find({"ticker": {"$regex": "^" + search }})
+        stocks = db.stocks.find({"ticker": {"$regex": "(?i)^" + search }})
     stockList = []
     for stock in stocks:
         ticker = stock['ticker']
