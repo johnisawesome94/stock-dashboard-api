@@ -29,7 +29,7 @@ def getStocks():
     stocks = db.stocks.find()
     stockList = []
     for stock in stocks:
-        newStock = Ticker('ETH-USD').summary_detail
+        newStock = Ticker(stock['ticker']).summary_detail
         newStock['id'] = stock['id']
         newStock['ticker'] = stock['ticker']
         newStock['numberShares'] = stock['numberShares']
