@@ -97,8 +97,8 @@ def putDarkMode():
 
     dM = db.darkMode.find()
     for dark in dM:
-        gotIn = true
-        id = dM[0]['_id']
+        gotIn = True
+        id = dark['_id']
         db.darkMode.update({ "_id": id }, { "$set": { 'darkMode': darkMode }})
 
     if gotIn == False:
