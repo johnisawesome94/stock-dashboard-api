@@ -74,5 +74,36 @@ def deleteStock(stockId):
 
     return generate_response('deleted stock with id: ' + stockId)
 
+
+##################
+## DARK-MODE API'S ##
+##################
+@app.route('/dark-mode', methods=['GET'])
+def getDarkMode():
+    darkMode = db.darkMode.find()
+    dark = darkMode['darkMode']
+
+    return jsonify({ 'darkMode': dark })
+
+
+@app.route('/dark-mode', methods=['PUT'])
+def putDarkMode():
+    data = request.json
+    darkMode = data['darkMode']
+
+    darkMode = db.darkMode.find()
+    if len(darkMode) > 0:
+        id = darkMode[0]['_id']
+        db.stocks.update({ "_id": id }, { "$set": { 'darkMode': darkMode }})
+    else:
+        db.stocks.insert_one({ 'darkMode': darkMode })
+
+
+    return generate_response('successfully updated darkmode')
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
