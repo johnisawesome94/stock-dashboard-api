@@ -27,11 +27,24 @@ def generate_response(resp):
 @app.route('/stocks', methods=['GET'])
 def getStocks():
     search = request.args.get('search')
+    sortKey = request.args.get('sortKey')
+    sortDir = request.args.get('sortDir')
 
-    if search is None:
+    if (sortDir is None and sortKey is not None) or (sortDir is not None and sortKey is None):
+        responseObject = { 'status': 'fail', 'message': 'Must have both sortDir and sortKey set, or neither set.' }
+        return make_response(jsonify(responseObject)), 500
+
+
+    if search is None and sortDir is None:
         stocks = db.stocks.find()
-    else:
+    elif search is None and sortDir is not None:
+        stocks = db.stocks.find().sort([(str(sortKey), int(sortDir))])
+    elif search is not None and sortDir is None:
         stocks = db.stocks.find({"ticker": {"$regex": "(?i).*" + search + ".*"}})
+    else:
+        stocks = db.stocks.find({"ticker": {"$regex": "(?i).*" + search + ".*"}}).sort([(str(sortKey), int(sortDir))])
+
+
     stockList = []
     for stock in stocks:
         print(stock)
