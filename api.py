@@ -65,7 +65,7 @@ def getStockChart():
     ticker = request.args.get('ticker')
     tickers = Ticker(ticker, asynchronous=True)
 
-    df = tickers.history(period='max', interval='1d')
+    df = tickers.history(period='1y', interval='1d')
     newList = df.to_records()
     someOtherList = []
     for bob in newList:
