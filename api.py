@@ -58,6 +58,26 @@ def getStocks():
 
     return jsonify(stockList)
 
+
+@app.route('/stocks/chart', methods=['GET'])
+def getStockChart():
+    tickers = Ticker('fb', asynchronous=True)
+
+    df = tickers.history(period='1mo', interval='1wk')
+    newList = df.to_records()
+    someOtherList = []
+    for bob in newList:
+        someOtherList.append({
+        'date': bob[1],
+        'low': float(bob[2]),
+        'high': float(bob[3]),
+        'volume': float(bob[4]),
+        'close': float(bob[5]),
+        'open': float(bob[6])
+        })
+    print(someOtherList)
+    return jsonify(someOtherList)
+
 @app.route('/stocks', methods=['POST'])
 def postStock():
     # TODO: what if stock with ticker already exists? Merge? Keep separate?
