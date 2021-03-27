@@ -61,7 +61,9 @@ def getStocks():
 
 @app.route('/stocks/chart', methods=['GET'])
 def getStockChart():
-    tickers = Ticker('fb', asynchronous=True)
+
+    ticker = request.args.get('ticker')
+    tickers = Ticker(ticker, asynchronous=True)
 
     df = tickers.history(period='1mo', interval='1wk')
     newList = df.to_records()
