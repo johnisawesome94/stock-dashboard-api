@@ -63,21 +63,44 @@ def getStocks():
 def getStockChart():
 
     ticker = request.args.get('ticker')
+    period = request.args.get('period')
+
+    # TODO: set default period value
+
+    switcher = {
+        '1d': "5m",
+        '7d': "30m",
+        '1mo': "1h",
+        '1y': "1d",
+        'ytd': "1d", # TODO: this varies based on the date
+        'max': "3mo" # TODO: this varies based on the stock
+    }
+
+    interval = switcher.get(period, "Invalid interval")
+
+    if interval == 'Invalid interval':
+        responseObject = { 'status': 'fail', 'message': 'Period of ' + period + ' is not supported' }
+        return make_response(jsonify(responseObject)), 500
+    print(period)
+    print(interval)
+
     tickers = Ticker(ticker, asynchronous=True)
 
-    df = tickers.history(period='1y', interval='1d')
+    df = tickers.history(period=period, interval=interval)
+    print(df)
+
     newList = df.to_records()
     someOtherList = []
     for bob in newList:
         someOtherList.append({
-        'date': bob[1],
-        'low': float(bob[2]),
-        'high': float(bob[3]),
-        'volume': float(bob[4]),
-        'close': float(bob[5]),
-        'open': float(bob[6])
+            'date': bob['date'],
+            'low': float(bob['low']),
+            'high': float(bob['high']),
+            'volume': float(bob['volume']),
+            'close': float(bob['close']),
+            'open': float(bob['open'])
         })
-    print(someOtherList)
+        print(someOtherList)
     return jsonify(someOtherList)
 
 @app.route('/stocks', methods=['POST'])
