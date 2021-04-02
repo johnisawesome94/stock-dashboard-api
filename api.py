@@ -65,7 +65,9 @@ def getStockChart():
     ticker = request.args.get('ticker')
     period = request.args.get('period')
 
-    # TODO: set default period value
+    # set default period if none passed to API
+    if period is None:
+        period = '1d'
 
     switcher = {
         '1d': "5m",
@@ -79,29 +81,36 @@ def getStockChart():
     interval = switcher.get(period, "Invalid interval")
 
     if interval == 'Invalid interval':
-        responseObject = { 'status': 'fail', 'message': 'Period of ' + period + ' is not supported' }
+        responseObject = { 'status': 'fail', 'message': 'Period of ' + str(period) + ' is not supported' }
         return make_response(jsonify(responseObject)), 500
-    print(period)
-    print(interval)
 
-    tickers = Ticker(ticker, asynchronous=True)
+     # if ticker isn't passed return avg stock data for all tickers user has added
+    if ticker is None:
+        stocks = db.stocks.find()
+        tickerString = ''
+        for stock in stocks:
+            tickerString = tickerString + stock['ticker'] + ' '
 
-    df = tickers.history(period=period, interval=interval)
-    print(df)
+        tickers = Ticker(tickerString.strip(), asynchronous=True)
+        df = tickers.history(period=period, interval=interval)
+        df = df.groupby('date').sum()
+    else:
+        tickers = Ticker(ticker, asynchronous=True)
+        df = tickers.history(period=period, interval=interval)
 
     newList = df.to_records()
     someOtherList = []
     for bob in newList:
         someOtherList.append({
-            'date': bob['date'],
+            'date': str(bob['date']),
             'low': float(bob['low']),
             'high': float(bob['high']),
             'volume': float(bob['volume']),
             'close': float(bob['close']),
             'open': float(bob['open'])
         })
-        print(someOtherList)
     return jsonify(someOtherList)
+
 
 @app.route('/stocks', methods=['POST'])
 def postStock():
